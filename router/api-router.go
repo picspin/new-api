@@ -323,6 +323,20 @@ func SetApiRouter(router *gin.Engine) {
 		mjRoute.GET("/self", middleware.UserAuth(), controller.GetUserMidjourney)
 		mjRoute.GET("/", middleware.AdminAuth(), controller.GetAllMidjourney)
 
+		pptJobController := controller.NewPPTJobController()
+		pptRoute := apiRouter.Group("/ppt")
+		pptRoute.Use(middleware.UserAuth())
+		{
+			pptRoute.GET("/jobs/:job_id", pptJobController.GetJobStatus)
+		}
+
+		podcastJobController := controller.NewPodcastJobController()
+		podcastRoute := apiRouter.Group("/podcast")
+		podcastRoute.Use(middleware.UserAuth())
+		{
+			podcastRoute.GET("/jobs/:job_id", podcastJobController.GetJobStatus)
+		}
+
 		taskRoute := apiRouter.Group("/task")
 		{
 			taskRoute.GET("/self", middleware.UserAuth(), controller.GetUserTask)
