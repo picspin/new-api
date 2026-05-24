@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/QuantumNous/new-api/common"
+	"github.com/QuantumNous/new-api/internal/opennotebook"
 	"github.com/google/uuid"
-	"github.com/new-api/common"
-	"github.com/new-api/internal/opennotebook"
 )
 
 type PptAdapter struct {

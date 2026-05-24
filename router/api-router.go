@@ -114,6 +114,10 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.DELETE("/oauth/bindings/:provider_id", controller.UnbindCustomOAuth)
 			}
 
+			// Capabilities
+			capabilityController := controller.NewCapabilityExecuteController()
+			apiRouter.POST("/capabilities/:capability_id/execute", middleware.UserAuth(), capabilityController.Execute)
+
 			adminRoute := userRoute.Group("/")
 			adminRoute.Use(middleware.AdminAuth())
 			{
@@ -392,6 +396,15 @@ func SetApiRouter(router *gin.Engine) {
 			deploymentsRoute.PUT("/:id/name", controller.UpdateDeploymentName)
 			deploymentsRoute.POST("/:id/extend", controller.ExtendDeployment)
 			deploymentsRoute.DELETE("/:id", controller.DeleteDeployment)
+		}
+
+		// Internal quota reservation routes
+		internalQuotaController := controller.NewInternalQuotaController()
+		internalQuotaRoute := apiRouter.Group("/internal/quota")
+		{
+			internalQuotaRoute.POST("/reservations", internalQuotaController.CreateReservation)
+			internalQuotaRoute.POST("/reservations/:reservation_id/settle", internalQuotaController.SettleReservation)
+			internalQuotaRoute.POST("/reservations/:reservation_id/release", internalQuotaController.ReleaseReservation)
 		}
 	}
 }

@@ -68,8 +68,14 @@ type PodcastStatusResponse struct {
 
 func (c *Client) SubmitSlideJob(ctx context.Context, req SlideGenerationRequest) (*SlideJobResponse, error) {
 	// POST /slides/generate
-	body, _ := json.Marshal(req)
-	httpReq, _ := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/slides/generate", bytes.NewReader(body))
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("opennotebook slides marshal failed: %w", err)
+	}
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/slides/generate", bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("opennotebook slides request creation failed: %w", err)
+	}
 	httpReq.Header.Set("Content-Type", "application/json")
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
@@ -81,13 +87,18 @@ func (c *Client) SubmitSlideJob(ctx context.Context, req SlideGenerationRequest)
 		return nil, fmt.Errorf("opennotebook slides submit failed status %d: %s", resp.StatusCode, string(b))
 	}
 	var result SlideJobResponse
-	json.NewDecoder(resp.Body).Decode(&result)
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("opennotebook slides decode failed: %w", err)
+	}
 	return &result, nil
 }
 
 func (c *Client) GetSlideJobStatus(ctx context.Context, jobID string) (*SlideStatusResponse, error) {
 	// GET /slides/jobs/{job_id}
-	httpReq, _ := http.NewRequestWithContext(ctx, "GET", c.baseURL+"/slides/jobs/"+jobID, nil)
+	httpReq, err := http.NewRequestWithContext(ctx, "GET", c.baseURL+"/slides/jobs/"+jobID, nil)
+	if err != nil {
+		return nil, fmt.Errorf("opennotebook slides status request creation failed: %w", err)
+	}
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
 		return nil, fmt.Errorf("opennotebook slides status failed: %w", err)
@@ -98,14 +109,22 @@ func (c *Client) GetSlideJobStatus(ctx context.Context, jobID string) (*SlideSta
 		return nil, fmt.Errorf("opennotebook slides status failed status %d: %s", resp.StatusCode, string(b))
 	}
 	var result SlideStatusResponse
-	json.NewDecoder(resp.Body).Decode(&result)
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("opennotebook slides status decode failed: %w", err)
+	}
 	return &result, nil
 }
 
 func (c *Client) SubmitPodcastJob(ctx context.Context, req PodcastGenerationRequest) (*PodcastJobResponse, error) {
 	// POST /podcasts/generate
-	body, _ := json.Marshal(req)
-	httpReq, _ := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/podcasts/generate", bytes.NewReader(body))
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("opennotebook podcasts marshal failed: %w", err)
+	}
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/podcasts/generate", bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("opennotebook podcasts request creation failed: %w", err)
+	}
 	httpReq.Header.Set("Content-Type", "application/json")
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
@@ -117,13 +136,18 @@ func (c *Client) SubmitPodcastJob(ctx context.Context, req PodcastGenerationRequ
 		return nil, fmt.Errorf("opennotebook podcasts submit failed status %d: %s", resp.StatusCode, string(b))
 	}
 	var result PodcastJobResponse
-	json.NewDecoder(resp.Body).Decode(&result)
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("opennotebook podcasts decode failed: %w", err)
+	}
 	return &result, nil
 }
 
 func (c *Client) GetPodcastJobStatus(ctx context.Context, jobID string) (*PodcastStatusResponse, error) {
 	// GET /podcasts/jobs/{job_id}
-	httpReq, _ := http.NewRequestWithContext(ctx, "GET", c.baseURL+"/podcasts/jobs/"+jobID, nil)
+	httpReq, err := http.NewRequestWithContext(ctx, "GET", c.baseURL+"/podcasts/jobs/"+jobID, nil)
+	if err != nil {
+		return nil, fmt.Errorf("opennotebook podcasts status request creation failed: %w", err)
+	}
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
 		return nil, fmt.Errorf("opennotebook podcasts status failed: %w", err)
@@ -134,6 +158,8 @@ func (c *Client) GetPodcastJobStatus(ctx context.Context, jobID string) (*Podcas
 		return nil, fmt.Errorf("opennotebook podcasts status failed status %d: %s", resp.StatusCode, string(b))
 	}
 	var result PodcastStatusResponse
-	json.NewDecoder(resp.Body).Decode(&result)
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("opennotebook podcasts status decode failed: %w", err)
+	}
 	return &result, nil
 }

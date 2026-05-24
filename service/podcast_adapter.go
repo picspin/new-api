@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/QuantumNous/new-api/common"
+	"github.com/QuantumNous/new-api/internal/opennotebook"
 	"github.com/google/uuid"
-	"github.com/new-api/common"
-	"github.com/new-api/internal/opennotebook"
 )
 
 type PodcastAdapter struct {
@@ -83,17 +83,4 @@ func (a *PodcastAdapter) GetPodcastJobStatus(ctx context.Context, job common.Pod
 	return &updated, nil
 }
 
-func MapOpenNotebookStatus(status string) string {
-	switch status {
-	case "pending", "queued":
-		return "pending"
-	case "processing", "running":
-		return "processing"
-	case "completed", "success":
-		return "completed"
-	case "failed", "error":
-		return "failed"
-	default:
-		return "failed"
-	}
-}
+
