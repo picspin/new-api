@@ -19,20 +19,25 @@ func NewPodcastAdapter(onbClient *opennotebook.Client) *PodcastAdapter {
 }
 
 type PodcastExecuteInput struct {
+	NotebookID      string
 	SourceRefs      []string
 	Voice           string
 	Language        string
 	MaxDurationSecs int
+	GroundingBundle *GroundingBundle
 }
 
 func (a *PodcastAdapter) CreatePodcastJob(ctx context.Context, reqID, userID string, input PodcastExecuteInput) (*common.PodcastJobState, error) {
 	jobID := uuid.New().String()
 
+	content := buildGroundingContent(input.GroundingBundle)
+
 	req := opennotebook.PodcastGenerationRequest{
 		EpisodeProfile: "default",
 		SpeakerProfile: input.Voice,
 		EpisodeName:    fmt.Sprintf("episode_%s", jobID),
-		Content:        "",
+		NotebookID:     input.NotebookID,
+		Content:        content,
 	}
 
 	res, err := a.onbClient.SubmitPodcastJob(ctx, req)

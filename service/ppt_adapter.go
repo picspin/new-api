@@ -19,20 +19,25 @@ func NewPptAdapter(onbClient *opennotebook.Client) *PptAdapter {
 }
 
 type PptExecuteInput struct {
-	SourceRefs []string
-	Template   string
-	Style      string
-	Slides     int
+	NotebookID     string
+	SourceRefs     []string
+	Template       string
+	Style          string
+	Slides         int
+	GroundingBundle *GroundingBundle
 }
 
 func (a *PptAdapter) CreatePptJob(ctx context.Context, reqID, userID string, input PptExecuteInput) (*common.PptJobState, error) {
 	jobID := uuid.New().String()
 
+	content := buildGroundingContent(input.GroundingBundle)
+
 	req := opennotebook.SlideGenerationRequest{
-		SlideProfile:  input.Template, // Mapping template to profile
+		SlideProfile:  input.Template,
 		DeckName:      fmt.Sprintf("deck_%s", jobID),
+		NotebookID:    input.NotebookID,
 		OutputFormats: []string{"pptx"},
-		Content:       "",
+		Content:       content,
 	}
 
 	res, err := a.onbClient.SubmitSlideJob(ctx, req)
